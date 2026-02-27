@@ -8,11 +8,21 @@ import {
 
 interface Settings {
   lastOpenedFile?: string;
+  geminiApiKey?: string;
+  geminiModel?: string;
+  geminiPrompt?: string;
 }
+
+const DEFAULT_MODEL = "models/gemini-2.5-flash-lite";
+const DEFAULT_PROMPT =
+  "Summarize the main content of the following webpage in 3-5 sentences.\n\nIMPORTANT: Detect the language of the webpage. If the webpage is written in Danish, you MUST write the entire summary in Danish. If it is written in English, write in English. For any other language, write in English.\n\nWebpage content:\n{content}\n\nRemember: if the webpage above is in Danish, your summary MUST be in Danish.";
 
 class SettingsStore {
   private configPath = $state<string>("");
   lastOpenedFile = $state<string | undefined>(undefined);
+  geminiApiKey = $state<string>("");
+  geminiModel = $state<string>(DEFAULT_MODEL);
+  geminiPrompt = $state<string>(DEFAULT_PROMPT);
 
   private unwatchFn: (() => void) | null = null;
   private lastSaveAt = 0;
@@ -26,6 +36,9 @@ class SettingsStore {
       const text = await readTextFile(configPath);
       const parsed = JSON.parse(text) as Settings;
       this.lastOpenedFile = parsed.lastOpenedFile;
+      this.geminiApiKey = parsed.geminiApiKey ?? "";
+      this.geminiModel = parsed.geminiModel ?? DEFAULT_MODEL;
+      this.geminiPrompt = parsed.geminiPrompt ?? DEFAULT_PROMPT;
     } catch {
       // File doesn't exist yet — write defaults
       await this._write();
@@ -40,6 +53,9 @@ class SettingsStore {
       this.lastSaveAt = Date.now();
       const settings: Settings = {
         lastOpenedFile: this.lastOpenedFile,
+        geminiApiKey: this.geminiApiKey || undefined,
+        geminiModel: this.geminiModel,
+        geminiPrompt: this.geminiPrompt,
       };
       await writeTextFile(this.configPath, JSON.stringify(settings, null, 2));
     } catch {
@@ -49,6 +65,21 @@ class SettingsStore {
 
   async setLastFile(path: string) {
     this.lastOpenedFile = path;
+    await this._write();
+  }
+
+  async setGeminiApiKey(key: string) {
+    this.geminiApiKey = key;
+    await this._write();
+  }
+
+  async setGeminiModel(model: string) {
+    this.geminiModel = model;
+    await this._write();
+  }
+
+  async setGeminiPrompt(prompt: string) {
+    this.geminiPrompt = prompt;
     await this._write();
   }
 
@@ -74,6 +105,9 @@ class SettingsStore {
           const text = await readTextFile(configPath);
           const parsed = JSON.parse(text) as Settings;
           self.lastOpenedFile = parsed.lastOpenedFile;
+          self.geminiApiKey = parsed.geminiApiKey ?? "";
+          self.geminiModel = parsed.geminiModel ?? DEFAULT_MODEL;
+          self.geminiPrompt = parsed.geminiPrompt ?? DEFAULT_PROMPT;
         } catch {
           // ignore
         }

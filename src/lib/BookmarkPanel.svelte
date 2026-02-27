@@ -3,6 +3,7 @@
   import Editor from "./Editor.svelte";
   import type { Bookmark } from "./types";
   import { store } from "./store.svelte";
+  import { settings } from "./settings.svelte";
   import { confirm } from "@tauri-apps/plugin-dialog";
 
   interface Props {
@@ -18,7 +19,11 @@
   let note = $state(bookmark.note);
   // svelte-ignore state_referenced_locally
   let tagsInput = $state(bookmark.tags.join(", "));
+  // svelte-ignore state_referenced_locally
+  let summary = $state(bookmark.summary);
   let fetchingTitle = $state(false);
+  let summarizing = $state(false);
+  let summaryError = $state<string | null>(null);
 
   // Auto-fetch title if empty
   $effect(() => {
@@ -44,7 +49,8 @@
   $effect(() => {
     const _t = title,
       _n = note,
-      _tags = tagsInput; // track deps
+      _tags = tagsInput,
+      _s = summary; // track deps
     const timer = setTimeout(() => save(), 1500);
     return () => clearTimeout(timer);
   });
@@ -54,8 +60,28 @@
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
-    store.updateBookmark({ ...bookmark, title, note, tags });
+    store.updateBookmark({ ...bookmark, title, note, tags, summary });
     if (store.filePath) store.save();
+  }
+
+  async function fetchSummary() {
+    if (!settings.geminiApiKey) return;
+    summarizing = true;
+    summaryError = null;
+    try {
+      const result = await invoke<string>("fetch_ai_summary", {
+        url: bookmark.url,
+        apiKey: settings.geminiApiKey,
+        model: settings.geminiModel,
+        promptTemplate: settings.geminiPrompt,
+      });
+      summary = result;
+      save();
+    } catch (e) {
+      summaryError = String(e);
+    } finally {
+      summarizing = false;
+    }
   }
 
   function openUrl() {
@@ -141,14 +167,14 @@
     </div>
 
     <!-- Note -->
-    <div class="flex flex-col gap-1 px-4 py-3 flex-1 min-h-0 overflow-hidden">
+    <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
       <!-- svelte-ignore a11y_label_has_associated_control -->
       <label
         class="text-xs uppercase tracking-widest text-base-content/50 font-mono shrink-0"
         >Note</label
       >
       <div
-        class="border border-base-300 rounded flex-1 flex flex-col overflow-hidden min-h-30"
+        class="border border-base-300 rounded flex flex-col overflow-hidden h-48"
       >
         <Editor
           content={note}
@@ -157,6 +183,40 @@
           }}
         />
       </div>
+    </div>
+
+    <!-- AI Summary -->
+    <div
+      class="flex flex-col gap-2 px-4 py-3 border-t border-base-300 shrink-0"
+    >
+      <!-- svelte-ignore a11y_label_has_associated_control -->
+      <label
+        class="text-xs uppercase tracking-widest text-base-content/50 font-mono"
+        >AI Summary</label
+      >
+      {#if !settings.geminiApiKey}
+        <p class="text-sm text-base-content/60 italic">
+          Enter a Gemini API key in <span class="font-medium">Settings</span> to
+          enable AI summaries.
+        </p>
+      {:else if summarizing}
+        <div class="flex items-center gap-2 text-sm text-base-content/60">
+          <span class="loading loading-spinner loading-xs"></span>
+          Generating summary…
+        </div>
+      {:else}
+        {#if summaryError}
+          <p class="text-sm text-error">{summaryError}</p>
+        {/if}
+        {#if summary}
+          <p class="text-sm text-base-content/80 whitespace-pre-wrap">
+            {summary}
+          </p>
+        {/if}
+        <button class="btn btn-xs btn-outline w-fit" onclick={fetchSummary}>
+          {summary ? "Re-summarize" : "Summarize"}
+        </button>
+      {/if}
     </div>
   </div>
 

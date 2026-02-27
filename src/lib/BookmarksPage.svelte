@@ -34,7 +34,13 @@
       await store.saveAs();
       if (!store.filePath) return;
     }
-    const bookmark = store.addBookmark({ url, title: "", note: "", tags: [] });
+    const bookmark = store.addBookmark({
+      url,
+      title: "",
+      note: "",
+      tags: [],
+      summary: "",
+    });
     activeBookmark = bookmark;
     await store.save();
   }

@@ -7,8 +7,9 @@
   import NavBar from "./lib/NavBar.svelte";
   import BookmarksPage from "./lib/BookmarksPage.svelte";
   import ProjectsPage from "./lib/ProjectsPage.svelte";
+  import SettingsPage from "./lib/SettingsPage.svelte";
 
-  type Tab = "bookmarks" | "projects";
+  type Tab = "bookmarks" | "projects" | "settings";
   let activeTab = $state<Tab>("bookmarks");
 
   onMount(async () => {
@@ -54,8 +55,10 @@
 
   {#if activeTab === "bookmarks"}
     <BookmarksPage />
-  {:else}
+  {:else if activeTab === "projects"}
     <ProjectsPage />
+  {:else}
+    <SettingsPage />
   {/if}
 </div>
 

@@ -4,6 +4,7 @@ export interface Bookmark {
   title: string;
   note: string;
   tags: string[];
+  summary: string;
   lastUpdated: string;
 }
 

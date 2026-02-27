@@ -8,6 +8,7 @@ In this project I will be creating a local-first bookmarking/research tool with 
 - Svelte
 - Code Mirror 6
 - Tailwind + DaisyUI
+- Integration with Gemini API to summarize websites
 
 ## Data Storage
 
@@ -20,7 +21,7 @@ interface Data {
     id: number;
     title: string;
     note: string;
-    bookmarks: string[]
+    bookmarks: number[];
     lastUpdated: string;
   }[];
   bookmarks: {
@@ -28,6 +29,7 @@ interface Data {
     title: string;
     note: string;
     tags: string[];
+    summary: string;
     lastUpdated: string;
   };
 }
@@ -35,7 +37,7 @@ interface Data {
 
 ## Design
 
-The user interface must be very simple. At the top are two tabs: bookmarks and projects
+The user interface must be very simple. At the top are three tabs: bookmarks, projects and settings
 
 ### Bookmarks page
 
@@ -48,6 +50,8 @@ Clicking the add bookmark button opens a dialog where the user can enter a URL. 
 **2. Opening a bookmark**
 
 Bookmarks open on the right. Here the user can edit the link's tags and note. The title is automatically fetched from the URL and taken from the document title.
+
+Additionally the AI summary will be shown. There is a button to reprompt the AI. If the Gemini token is not entered, the user is shown an appropriate message. The summary is not fetched initially, only when the user clicks the button.
 
 **3. List of bookmarks**
 
@@ -66,6 +70,10 @@ The project page looks similar to the bookmarks page with a list on the left, th
 Clicking the add button opens an empty project on the right. It is not saved yet, only when the user types something into the fields. In addition to the title and note fields, the user can add notes to the project by searching within the project view. A list will be shown similar to the bookmark list described previously.
 
 The rest of the projects page is similar to the bookmarks page.
+
+### Settings page
+
+The settings page contains a text field to input a Gemini API token. The token is saved to the settings.json file (see below).
 
 ## Keyboard shortcuts
 

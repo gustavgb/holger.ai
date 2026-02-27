@@ -1,7 +1,7 @@
 <script lang="ts">
   import { store } from "./store.svelte";
 
-  type Tab = "bookmarks" | "projects";
+  type Tab = "bookmarks" | "projects" | "settings";
 
   interface Props {
     activeTab: Tab;
@@ -25,9 +25,14 @@
     class="tab {activeTab === 'projects' ? 'tab-active' : ''}"
     onclick={() => onTabChange("projects")}>Projects</button
   >
+  <button
+    role="tab"
+    class="tab {activeTab === 'settings' ? 'tab-active' : ''}"
+    onclick={() => onTabChange("settings")}>Settings</button
+  >
 </div>
 
-{#if !store.filePath}
+{#if !store.filePath && activeTab !== "settings"}
   <div
     class="px-4 py-2 text-xs text-base-content/60 border-b border-base-300 shrink-0"
   >

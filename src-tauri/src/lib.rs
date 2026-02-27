@@ -116,7 +116,122 @@ async fn fetch_page_title(url: String) -> Result<String, String> {
     Ok(url)
 }
 
+#[tauri::command]
+async fn list_gemini_models(api_key: String) -> Result<Vec<String>, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("Mozilla/5.0 (compatible; holger.ai/1.0)")
+        .timeout(std::time::Duration::from_secs(10))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/models?key={}",
+        api_key
+    );
+    let resp = client.get(&url).send().await.map_err(|e| e.to_string())?;
+    let json: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;
+    let names = json["models"]
+        .as_array()
+        .ok_or("Unexpected response from models endpoint")?
+        .iter()
+        .filter_map(|m| {
+            let name = m["name"].as_str()?;
+            let supported = m["supportedGenerationMethods"]
+                .as_array()
+                .map(|a| a.iter().any(|v| v.as_str() == Some("generateContent")))
+                .unwrap_or(false);
+            if supported {
+                Some(name.to_string())
+            } else {
+                None
+            }
+        })
+        .collect();
+    Ok(names)
+}
+
 /// Opens a URL in the system's default browser.
+#[tauri::command]
+async fn fetch_ai_summary(
+    url: String,
+    api_key: String,
+    model: String,
+    prompt_template: String,
+) -> Result<String, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("Mozilla/5.0 (compatible; holger.ai/1.0)")
+        .timeout(std::time::Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    // Fetch page content
+    let response = client.get(&url).send().await.map_err(|e| e.to_string())?;
+    let html = response.text().await.map_err(|e| e.to_string())?;
+
+    // Strip HTML tags to get plain text
+    let mut text = String::with_capacity(html.len());
+    let mut in_tag = false;
+    let mut in_script = false;
+    let mut tag_buf = String::new();
+    for ch in html.chars() {
+        if ch == '<' {
+            in_tag = true;
+            tag_buf.clear();
+        } else if ch == '>' {
+            let tag_lower = tag_buf.to_lowercase();
+            if tag_lower.starts_with("script") || tag_lower.starts_with("style") {
+                in_script = true;
+            } else if tag_lower.starts_with("/script") || tag_lower.starts_with("/style") {
+                in_script = false;
+            }
+            in_tag = false;
+            text.push(' ');
+        } else if in_tag {
+            tag_buf.push(ch);
+        } else if !in_script {
+            text.push(ch);
+        }
+    }
+    // Collapse whitespace
+    let text: String = text.split_whitespace().collect::<Vec<_>>().join(" ");
+    let text = if text.len() > 10_000 {
+        &text[..10_000]
+    } else {
+        &text
+    };
+
+    // Call Gemini API
+    let prompt = prompt_template.replace("{content}", text);
+    let body = serde_json::json!({
+        "contents": [{"parts": [{"text": prompt}]}]
+    });
+    let gemini_url = format!(
+        "https://generativelanguage.googleapis.com/v1beta/{}:generateContent?key={}",
+        model, api_key
+    );
+    let resp = client
+        .post(&gemini_url)
+        .json(&body)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let status = resp.status();
+    let json: serde_json::Value = resp.json().await.map_err(|e| e.to_string())?;
+
+    if !status.is_success() {
+        let msg = json["error"]["message"]
+            .as_str()
+            .unwrap_or("Unknown Gemini API error");
+        return Err(format!("Gemini API error {}: {}", status, msg));
+    }
+
+    let summary = json["candidates"][0]["content"]["parts"][0]["text"]
+        .as_str()
+        .ok_or_else(|| format!("Unexpected Gemini response: {}", json))?
+        .to_string();
+    Ok(summary)
+}
+
 #[tauri::command]
 async fn open_url(url: String) -> Result<(), String> {
     #[cfg(target_os = "linux")]
@@ -162,6 +277,8 @@ pub fn run() {
             close_app,
             get_settings_path,
             fetch_page_title,
+            fetch_ai_summary,
+            list_gemini_models,
             open_url,
         ])
         .plugin(tauri_plugin_fs::init())
