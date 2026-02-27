@@ -24,7 +24,8 @@
 
   $effect(() => {
     const unlisten = listen<string>("menu-action", async ({ payload: id }) => {
-      if (id === "open") await store.open();
+      if (id === "new") await store.newFile();
+      else if (id === "open") await store.open();
       else if (id === "save") await store.save();
       else if (id === "save_as") await store.saveAs();
       else if (id === "quit") invoke("close_app");
@@ -35,7 +36,10 @@
   });
 
   function onKeydown(e: KeyboardEvent) {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "S") {
+    if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+      e.preventDefault();
+      store.newFile();
+    } else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "S") {
       e.preventDefault();
       store.saveAs();
     } else if ((e.ctrlKey || e.metaKey) && e.key === "s") {

@@ -10,7 +10,8 @@ A private, git-friendly, local-first bookmarking and research tool with optional
 - Organize bookmarks into projects
 - Quickly find projects and bookmarks using fuzzy search
 - Keyboard shortcuts:
-  - `Ctrl+O` — Open file
+  - `Ctrl+N` — New data file
+  - `Ctrl+O` — Open data file
   - `Ctrl+S` — Save
   - `Ctrl+Shift+S` — Save As
   - `Ctrl+-/+` — Zoom out/in

@@ -284,6 +284,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
+            let new_i = MenuItem::with_id(app, "new", "New Data File", true, Some("CmdOrCtrl+N"))?;
             let open_i = MenuItem::with_id(
                 app,
                 "open",
@@ -306,7 +307,7 @@ pub fn run() {
                 app,
                 "File",
                 true,
-                &[&open_i, &save_i, &save_as_i, &sep, &quit_i],
+                &[&new_i, &open_i, &save_i, &save_as_i, &sep, &quit_i],
             )?;
 
             let menu = Menu::with_items(app, &[&file_menu])?;

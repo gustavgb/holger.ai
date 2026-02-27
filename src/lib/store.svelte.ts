@@ -80,6 +80,16 @@ class BookmarkStore {
     }
   }
 
+  async newFile() {
+    this._stopWatcher();
+    this.data = structuredClone(EMPTY_DATA);
+    this.filePath = "";
+    this.dirty = false;
+    this.error = "";
+    this.updateTitle();
+    await this.saveAs();
+  }
+
   async openPath(path: string) {
     this._stopWatcher();
     try {
