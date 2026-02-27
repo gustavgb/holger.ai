@@ -1,4 +1,4 @@
-<img src="himark_icon.png" width="50px" height="50px">
+<img src="holgeraiicon.png" width="50px" height="50px">
 
 # Holger.AI
 
@@ -6,15 +6,14 @@ A bookmarking and research tool using AI.
 
 ## Features
 
-- Save links to websites and add tags and markdown notes.
-- Summarize websites using AI and save summaries alongside tags and notes. 
-- Syntax highlighting for Markdown via CodeMirror 6 (Lezer parser)
+- Summarize websites using Gemini models and add your own tags and markdown notes.
+- Organize bookmarks into projects
+- Quickly find projects and bookmarks using fuzzy search
 - Keyboard shortcuts:
   - `Ctrl+O` — Open file
   - `Ctrl+S` — Save
   - `Ctrl+Shift+S` — Save As
   - `Ctrl+-/+` — Zoom out/in
-  - `Ctrl+K` — Quick fuzzy search
 
 ## Development
 

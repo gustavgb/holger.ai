@@ -1,6 +1,6 @@
 {
   "identifier": "default",
-  "description": "Default capability for text-editor",
+  "description": "Default capability for holger.ai",
   "windows": [
     "main"
   ],
