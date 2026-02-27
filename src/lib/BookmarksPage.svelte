@@ -86,7 +86,7 @@
           : ''}"
         onclick={() => (activeBookmark = b)}
       >
-        <div class="flex items-baseline gap-1.5 mb-0.5 flex-wrap">
+        <div class="flex items-baseline gap-1.5 mb-1 flex-wrap">
           <span class="text-xs text-base-content/50 font-mono shrink-0"
             >#{b.id}</span
           >
@@ -95,18 +95,20 @@
           >
         </div>
         {#if b.tags.length > 0}
-          <div class="flex flex-wrap gap-1 mb-1">
+          <div class="flex flex-wrap gap-1 mb-2">
             {#each b.tags as tag}
               <span class="badge badge-outline badge-xs">{tag}</span>
             {/each}
           </div>
         {/if}
-        <div class="text-xs text-primary font-mono truncate opacity-70">
+        <div class="text-xs text-primary font-mono truncate opacity-70 mb-1">
           {b.url}
         </div>
         {#if b.note}
-          <div class="text-xs text-base-content/50 mt-0.5 truncate">
-            {b.note.slice(0, 80)}
+          <div
+            class="text-xs text-base-content/50 mt-1 line-clamp-3 whitespace-pre-wrap"
+          >
+            {b.note}
           </div>
         {/if}
       </div>
