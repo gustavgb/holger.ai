@@ -1,4 +1,4 @@
-export interface Link {
+export interface Bookmark {
   id: number;
   url: string;
   title: string;
@@ -7,22 +7,22 @@ export interface Link {
   lastUpdated: string;
 }
 
-export interface Collection {
+export interface Project {
   id: number;
   title: string;
   note: string;
-  links: number[];
+  bookmarks: number[]; // bookmark IDs
   lastUpdated: string;
 }
 
 export interface Data {
   idCounter: number;
-  collections: Collection[];
-  links: Link[];
+  projects: Project[];
+  bookmarks: Bookmark[];
 }
 
 export const EMPTY_DATA: Data = {
   idCounter: 0,
-  collections: [],
-  links: [],
+  projects: [],
+  bookmarks: [],
 };
