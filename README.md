@@ -6,9 +6,8 @@ A private, git-friendly, local-first bookmarking and research tool with optional
 
 ## Features
 
-- Summarize websites using Gemini models and add your own tags and markdown notes.
-- Organize bookmarks into projects.
-- Quickly find projects and bookmarks using fuzzy search.
+- Summarize websites using Gemini models and add your own tags and notes.
+- Quickly find bookmarks using fuzzy search.
 - Data is stored in a JSON file - easily checked into git.
 - Manage multiple data files for separation between areas of life.
 - Keyboard shortcuts:

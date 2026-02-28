@@ -6,7 +6,7 @@ import {
   type WatchEvent,
 } from "@tauri-apps/plugin-fs";
 import { invoke } from "@tauri-apps/api/core";
-import { type Data, type Bookmark, type Project, EMPTY_DATA } from "./types";
+import { type Data, type Bookmark, EMPTY_DATA } from "./types";
 import { settings } from "./settings.svelte";
 
 // ─── Reactive Store ────────────────────────────────────────────────────────
@@ -25,10 +25,6 @@ class BookmarkStore {
 
   readonly sortedBookmarks = $derived(
     [...this.data.bookmarks].sort((a, b) => b.id - a.id)
-  );
-
-  readonly sortedProjects = $derived(
-    [...this.data.projects].sort((a, b) => b.id - a.id)
   );
 
   // ─── Window title ──────────────────────────────────────────────────────────
@@ -96,7 +92,6 @@ class BookmarkStore {
       const text = await readTextFile(path);
       const parsed = JSON.parse(text) as Data;
       if (!parsed.bookmarks) parsed.bookmarks = [];
-      if (!parsed.projects) parsed.projects = [];
       if (!parsed.idCounter) parsed.idCounter = 0;
       this.data = parsed;
       this.filePath = path;
@@ -139,32 +134,6 @@ class BookmarkStore {
 
   deleteBookmark(id: number) {
     this.data.bookmarks = this.data.bookmarks.filter((b) => b.id !== id);
-    this.data.projects = this.data.projects.map((p) => ({
-      ...p,
-      bookmarks: p.bookmarks.filter((bid) => bid !== id),
-    }));
-    this.dirty = true;
-  }
-
-  // ─── Project CRUD ──────────────────────────────────────────────────────────
-
-  addProject(partial: Omit<Project, "id" | "lastUpdated">): Project {
-    const id = ++this.data.idCounter;
-    const project: Project = { id, lastUpdated: new Date().toISOString(), ...partial };
-    this.data.projects = [project, ...this.data.projects];
-    this.dirty = true;
-    return project;
-  }
-
-  updateProject(updated: Project) {
-    const idx = this.data.projects.findIndex((p) => p.id === updated.id);
-    if (idx === -1) return;
-    this.data.projects[idx] = { ...updated, lastUpdated: new Date().toISOString() };
-    this.dirty = true;
-  }
-
-  deleteProject(id: number) {
-    this.data.projects = this.data.projects.filter((p) => p.id !== id);
     this.dirty = true;
   }
 
@@ -190,7 +159,6 @@ class BookmarkStore {
           const text = await readTextFile(path);
           const parsed = JSON.parse(text) as Data;
           if (!parsed.bookmarks) parsed.bookmarks = [];
-          if (!parsed.projects) parsed.projects = [];
           if (!parsed.idCounter) parsed.idCounter = 0;
           self.data = parsed;
           self.dirty = false;

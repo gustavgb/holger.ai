@@ -1,7 +1,7 @@
 <script lang="ts">
   import { store } from "./store.svelte";
 
-  type Tab = "bookmarks" | "projects" | "settings";
+  type Tab = "bookmarks" | "settings";
 
   interface Props {
     activeTab: Tab;
@@ -19,11 +19,6 @@
     role="tab"
     class="tab {activeTab === 'bookmarks' ? 'tab-active' : ''}"
     onclick={() => onTabChange("bookmarks")}>Bookmarks</button
-  >
-  <button
-    role="tab"
-    class="tab {activeTab === 'projects' ? 'tab-active' : ''}"
-    onclick={() => onTabChange("projects")}>Projects</button
   >
   <button
     role="tab"

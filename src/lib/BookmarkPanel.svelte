@@ -1,6 +1,5 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-  import Editor from "./Editor.svelte";
   import type { Bookmark } from "./types";
   import { store } from "./store.svelte";
   import { settings } from "./settings.svelte";
@@ -110,7 +109,6 @@
     class="flex items-center justify-between px-4 py-3 border-b border-base-300 shrink-0"
   >
     <span class="text-xs text-base-content/60 font-mono">#{bookmark.id}</span>
-    <button class="btn btn-ghost btn-xs btn-circle" onclick={onclose}>✕</button>
   </div>
 
   <div class="flex-1 overflow-y-auto flex flex-col">
@@ -166,25 +164,6 @@
       />
     </div>
 
-    <!-- Note -->
-    <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
-      <!-- svelte-ignore a11y_label_has_associated_control -->
-      <label
-        class="text-xs uppercase tracking-widest text-base-content/50 font-mono shrink-0"
-        >Note</label
-      >
-      <div
-        class="border border-base-300 rounded flex flex-col overflow-hidden h-48"
-      >
-        <Editor
-          content={note}
-          onchange={(v) => {
-            note = v;
-          }}
-        />
-      </div>
-    </div>
-
     <!-- AI Summary -->
     <div
       class="flex flex-col gap-2 px-4 py-3 border-t border-base-300 shrink-0"
@@ -217,6 +196,17 @@
           {summary ? "Re-summarize" : "Summarize"}
         </button>
       {/if}
+    </div>
+
+    <!-- Note -->
+    <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
+      <!-- svelte-ignore a11y_label_has_associated_control -->
+      <label
+        class="text-xs uppercase tracking-widest text-base-content/50 font-mono shrink-0"
+        for="bm-note">Note</label
+      >
+      <textarea bind:value={note} rows="4" class="textarea w-full" id="bm-note"
+      ></textarea>
     </div>
   </div>
 

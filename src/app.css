@@ -12,16 +12,3 @@ body {
   display: flex;
   flex-direction: column;
 }
-
-/* CodeMirror */
-.cm-editor {
-  flex: 1;
-  height: 100%;
-}
-
-.cm-content {
-  padding: 8px 12px 32px !important;
-  max-width: none !important;
-  margin-inline: 0 !important;
-  padding-inline: 12px !important;
-}
