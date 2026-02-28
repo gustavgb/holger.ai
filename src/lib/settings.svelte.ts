@@ -5,6 +5,7 @@ import {
   watch,
   type WatchEvent,
 } from "@tauri-apps/plugin-fs";
+import { store } from "./store.svelte";
 
 interface Settings {
   lastOpenedFile?: string;
@@ -87,6 +88,15 @@ class SettingsStore {
     // Add to set, cap at MAX_RECENT, then sort alphabetically by filename
     const updated = [path, ...this.recentWorkspaces.filter((p) => p !== path)].slice(0, MAX_RECENT);
     this.recentWorkspaces = sortByFilename(updated);
+    await this._write();
+  }
+
+  async removeRecentWorkspace(path: string) {
+    this.recentWorkspaces = this.recentWorkspaces.filter((p) => p !== path);
+    if (this.lastOpenedFile === path) {
+      this.lastOpenedFile = this.recentWorkspaces[0];
+      store.openPath(this.lastOpenedFile);
+    }
     await this._write();
   }
 

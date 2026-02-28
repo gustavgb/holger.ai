@@ -27,7 +27,7 @@
       tags: [],
       summary: "",
     });
-    bookmarks.setActiveBookmark(bookmark);
+    bookmarks.activeBookmark = bookmark;
     await store.save();
   }
 

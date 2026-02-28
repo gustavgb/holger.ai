@@ -8,6 +8,7 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { type Data, type Bookmark, EMPTY_DATA } from "./types";
 import { settings } from "./settings.svelte";
+import { bookmarks } from "./bookmarks.svelte";
 
 // ─── Reactive Store ────────────────────────────────────────────────────────
 
@@ -103,6 +104,7 @@ class BookmarkStore {
     this.updateTitle();
     if (this.filePath) this._watchFile(this.filePath);
     await settings.setLastFile(path);
+    bookmarks.activeBookmark = null;
   }
 
   async open() {

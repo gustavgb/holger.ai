@@ -6,8 +6,6 @@ class BookmarkStore {
 
   showAddDialog = () => this.addDialogOpen = true;
   hideAddDialog = () => this.addDialogOpen = false;
-
-  setActiveBookmark = (bm: Bookmark) => this.activeBookmark = bm;
 }
 
 export const bookmarks = new BookmarkStore();

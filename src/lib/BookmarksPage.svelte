@@ -82,35 +82,60 @@
       >
         {#each settings.recentWorkspaces as path (path)}
           <li>
-            <button
-              class="flex items-center gap-2 text-left w-full {store.filePath ===
+            <div
+              class="flex items-center gap-1 px-2 py-1 rounded-btn {store.filePath ===
               path
-                ? 'active'
+                ? 'bg-base-content/10'
                 : ''}"
-              onclick={() => {
-                store.openPath(path);
-                (document.activeElement as HTMLElement)?.blur();
-              }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="size-3.5 shrink-0 opacity-60"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              <button
+                class="flex items-center gap-2 text-left flex-1 min-w-0 hover:text-base-content"
+                onclick={() => {
+                  store.openPath(path);
+                  (document.activeElement as HTMLElement)?.blur();
+                }}
               >
-                <path
-                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                />
-              </svg>
-              <span class="truncate flex-1 text-sm">{fileName(path)}</span>
-              {#if store.filePath === path}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  class="size-3.5 shrink-0"
+                  class="size-3.5 shrink-0 opacity-60"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+                <span class="truncate flex-1 text-sm">{fileName(path)}</span>
+                {#if store.filePath === path}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="size-3.5 shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                {/if}
+              </button>
+              <button
+                class="btn btn-ghost btn-xs shrink-0 opacity-40 hover:opacity-100 hover:btn-error"
+                title="Remove from recents"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  settings.removeRecentWorkspace(path);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="size-3"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -118,10 +143,11 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <polyline points="20 6 9 17 4 12" />
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-              {/if}
-            </button>
+              </button>
+            </div>
           </li>
         {/each}
       </ul>
