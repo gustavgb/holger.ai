@@ -321,7 +321,7 @@ pub fn run() {
             let bm_new_i = MenuItem::with_id(
                 app,
                 "new_bookmark",
-                "New bookmark",
+                "Add bookmark",
                 true,
                 Some("CmdOrCtrl+N"),
             )?;

@@ -40,11 +40,10 @@ The user interface must be very simple.
 The native menu contains the following menu items:
 
 - File
-  - New workspace (adds to settings.json)
-  - Open workspace (adds to settings.json)
+  - New workspace
+  - Open workspace
   - Save
   - Save as
-  - Close workspace (removes from settings.json)
   - Preferences
   - Quit
 - Bookmarks
