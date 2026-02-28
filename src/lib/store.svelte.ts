@@ -77,6 +77,15 @@ class BookmarkStore {
     }
   }
 
+  close() {
+    this._stopWatcher();
+    this.data = structuredClone(EMPTY_DATA);
+    this.filePath = "";
+    this.dirty = false;
+    this.error = "";
+    this.updateTitle();
+  }
+
   async newFile() {
     this._stopWatcher();
     this.data = structuredClone(EMPTY_DATA);

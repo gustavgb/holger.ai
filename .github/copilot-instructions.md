@@ -42,7 +42,6 @@ The native menu contains the following menu items:
 - File
   - New workspace
   - Open workspace
-  - Save
   - Save as
   - Preferences
   - Quit
@@ -83,7 +82,6 @@ The settings page contains a text field to input a Gemini API token. The token i
 - `Ctrl+F` - Focus searchbar
 - `Ctrl+Shift+N` - New workspace file
 - `Ctrl+O` - Open workspace file
-- `Ctrl+S` - Save
 - `Ctrl+Shift+S` - Save as
 - `Ctrl+Q` - Close (ask if unsaved changes)
 

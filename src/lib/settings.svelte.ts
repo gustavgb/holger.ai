@@ -84,6 +84,7 @@ class SettingsStore {
   }
 
   async setLastFile(path: string) {
+    if (!path) return;
     this.lastOpenedFile = path;
     // Add to set, cap at MAX_RECENT, then sort alphabetically by filename
     const updated = [path, ...this.recentWorkspaces.filter((p) => p !== path)].slice(0, MAX_RECENT);
@@ -94,8 +95,7 @@ class SettingsStore {
   async removeRecentWorkspace(path: string) {
     this.recentWorkspaces = this.recentWorkspaces.filter((p) => p !== path);
     if (this.lastOpenedFile === path) {
-      this.lastOpenedFile = this.recentWorkspaces[0];
-      store.openPath(this.lastOpenedFile);
+      this.lastOpenedFile = this.recentWorkspaces[0] ?? undefined;
     }
     await this._write();
   }

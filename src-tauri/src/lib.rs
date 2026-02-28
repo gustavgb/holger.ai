@@ -287,14 +287,8 @@ pub fn run() {
             // File menu
             let new_i =
                 MenuItem::with_id(app, "new", "New workspace", true, Some("CmdOrCtrl+Shift+N"))?;
-            let open_i = MenuItem::with_id(
-                app,
-                "open",
-                "Open workspace\u{2026}",
-                true,
-                Some("CmdOrCtrl+O"),
-            )?;
-            let save_i = MenuItem::with_id(app, "save", "Save", true, Some("CmdOrCtrl+S"))?;
+            let open_i =
+                MenuItem::with_id(app, "open", "Open workspace", true, Some("CmdOrCtrl+O"))?;
             let save_as_i = MenuItem::with_id(
                 app,
                 "save_as",
@@ -312,9 +306,7 @@ pub fn run() {
                 app,
                 "File",
                 true,
-                &[
-                    &new_i, &open_i, &save_i, &save_as_i, &sep, &prefs_i, &sep2, &quit_i,
-                ],
+                &[&new_i, &open_i, &save_as_i, &sep, &prefs_i, &sep2, &quit_i],
             )?;
 
             // Bookmarks menu

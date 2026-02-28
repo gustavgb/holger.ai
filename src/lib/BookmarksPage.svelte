@@ -130,6 +130,7 @@
                 title="Remove from recents"
                 onclick={(e) => {
                   e.stopPropagation();
+                  if (store.filePath === path) store.close();
                   settings.removeRecentWorkspace(path);
                 }}
               >
