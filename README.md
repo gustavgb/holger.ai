@@ -6,16 +6,11 @@ A private, git-friendly, local-first bookmarking and research tool with optional
 
 ## Features
 
-- Summarize websites using Gemini models and add your own tags and notes.
+- Bookmark websites and assign a fixed ID for reference in hand-written notes.
+- Summarize websites using Gemini models and add your own tags and notes in the app.
 - Quickly find bookmarks using fuzzy search.
 - Data is stored in a JSON file - easily checked into git.
-- Manage multiple data files for separation between areas of life.
-- Keyboard shortcuts:
-  - `Ctrl+N` — New data file
-  - `Ctrl+O` — Open data file
-  - `Ctrl+S` — Save
-  - `Ctrl+Shift+S` — Save As
-  - `Ctrl+-/+` — Zoom out/in
+- Manage multiple workspace files for separation between areas of life.
 
 ## Development
 
