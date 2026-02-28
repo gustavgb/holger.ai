@@ -102,7 +102,7 @@
                 </div>
               </button>
               <button
-                class="btn btn-ghost btn-xs opacity-0 group-hover:opacity-40 hover:!opacity-100 hover:btn-error shrink-0 mr-1"
+                class="btn btn-ghost btn-xs opacity-0 group-hover:opacity-40 hover:opacity-100! hover:btn-error shrink-0 mr-1"
                 title="Remove from recents"
                 onclick={() => settings.removeRecentWorkspace(path)}
               >

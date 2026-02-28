@@ -5,7 +5,6 @@ import {
   watch,
   type WatchEvent,
 } from "@tauri-apps/plugin-fs";
-import { store } from "./store.svelte";
 
 interface Settings {
   lastOpenedFile?: string;
@@ -17,7 +16,7 @@ interface Settings {
 
 const DEFAULT_MODEL = "models/gemini-2.5-flash-lite";
 const DEFAULT_PROMPT =
-  "Summarize the main content of the following webpage in 3-5 sentences.\n\nIMPORTANT: Detect the language of the webpage. If the webpage is written in Danish, you MUST write the entire summary in Danish. If it is written in English, write in English. For any other language, write in English.\n\nWebpage content:\n{content}\n\nRemember: if the webpage above is in Danish, your summary MUST be in Danish.";
+  "Summarize the main content of the following webpage in 3-5 sentences.\n\nWebpage content:\n{content}";
 
 const MAX_RECENT = 10;
 
