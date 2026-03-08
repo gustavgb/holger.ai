@@ -38,13 +38,17 @@
         }
     });
 
-    // Auto-save (0.5 s debounced) — skip the very first run (mount)
+    // Auto-save (0.5 s debounced)
     $effect(() => {
         const _t = title,
             _tags = tagsInput; // track deps
         const timer = setTimeout(() => save(), 500);
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+        };
     });
+
+    $effect(() => () => save());
 
     function save() {
         const tags = tagsInput

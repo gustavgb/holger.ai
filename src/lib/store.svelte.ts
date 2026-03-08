@@ -266,7 +266,7 @@ class BookmarkStore {
     watch(
       watchPath,
       async (event: WatchEvent) => {
-        if (cancelled) return;
+        if (cancelled || this.saving) return;
         const kind = event.type as object;
         if (!("modify" in kind) && !("remove" in kind)) return;
 
