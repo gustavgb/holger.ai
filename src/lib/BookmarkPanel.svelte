@@ -5,6 +5,7 @@
     import { confirm } from "@tauri-apps/plugin-dialog";
     import { ui } from "./ui.svelte";
     import { formatRelativeTime } from "./utils";
+    import { fetchAnswer } from "./ai";
 
     let scrollEl = $state<HTMLDivElement | null>(null);
 
@@ -24,6 +25,9 @@
     let lastSeenMtime = $state(0);
     const sections = $derived(bookmark?.sections);
     const mtime = $derived(bookmark?.mtime);
+    const tags = $derived(bookmark?.tags);
+    let question = $state("");
+    let fetchingAnswer = $state(false);
 
     // Sync local fields when the file watcher reloads bookmarks from disk.
     $effect(() => {
@@ -105,6 +109,16 @@
             onclose();
         }
     }
+
+    async function askQuestion(e: SubmitEvent) {
+        e.preventDefault();
+
+        if (!bookmark) return;
+        fetchingAnswer = true;
+        await fetchAnswer(bookmark, question);
+        fetchingAnswer = false;
+        question = "";
+    }
 </script>
 
 <svelte:window onkeydown={onKeydown} />
@@ -145,42 +159,27 @@
     </div>
 
     <div class="flex-1 overflow-y-auto flex flex-col" bind:this={scrollEl}>
-        <!-- Title -->
-        <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
-            <label
-                for="bm-title"
-                class="text-xs uppercase tracking-widest text-base-content/50 font-mono"
-                >Title</label
-            >
-            {#if fetchingTitle}
-                <span class="text-sm text-base-content/60 italic"
-                    >Fetching title…</span
-                >
-            {:else}
-                <input
-                    id="bm-title"
-                    type="text"
-                    bind:value={title}
-                    placeholder="Enter title…"
-                    class="input input-sm w-full"
-                />
-            {/if}
-        </div>
-
-        <!-- URL -->
-        <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
-            <!-- svelte-ignore a11y_label_has_associated_control -->
-            <label
-                class="text-xs uppercase tracking-widest text-base-content/50 font-mono"
-                >URL</label
-            >
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <span
-                class="text-sm text-primary font-mono cursor-pointer underline underline-offset-2 truncate block hover:opacity-80"
+        <!-- Bookmark details -->
+        <div
+            class="flex flex-col gap-1 px-4 py-3 border-b border-base-300 items-start"
+        >
+            <p class="text-sm">{title}</p>
+            <!-- {#if tags?.length}
+                <div class="flex flex-wrap gap-1 mb-2">
+                    {#each tags as tag}
+                        <span class="badge badge-outline badge-xs">{tag}</span>
+                    {/each}
+                </div>
+            {/if} -->
+            <button
+                class="text-sm text-primary font-mono underline underline-offset-2 truncate text-left cursor-pointer"
                 onclick={openUrl}
-                title="Open in browser">{bookmark?.url}</span
+                type="button"
+                tabindex={-1}
+                title="Open in browser"
             >
+                {bookmark?.url}
+            </button>
         </div>
 
         <!-- Tags -->
@@ -197,6 +196,28 @@
                 placeholder="tag1, tag2, tag3"
                 class="input input-sm w-full"
             />
+        </div>
+
+        <!-- Ask question -->
+        <div class="flex flex-col gap-1 px-4 py-3 border-b border-base-300">
+            <label
+                for="ai-prompt"
+                class="text-xs uppercase tracking-widest text-base-content/50 font-mono"
+                >Ask a question</label
+            >
+            <form onsubmit={askQuestion} class="flex items-center gap-2">
+                <input
+                    id="ai-prompt"
+                    type="text"
+                    bind:value={question}
+                    placeholder=""
+                    class="input input-sm w-full"
+                    disabled={fetchingAnswer}
+                />
+                <button class="btn btn-sm"
+                    >{fetchingAnswer ? "Loading..." : "Send"}</button
+                >
+            </form>
         </div>
 
         <!-- Read-only sections -->

@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { settings } from "./settings.svelte";
 import { Bookmark } from "./types";
 import { store } from "./store.svelte";
+import { formatDate } from "./utils";
 
 export async function fetchSummary(bookmark: Bookmark) {
   if (!settings.geminiApiKey) return;
@@ -27,6 +28,35 @@ export async function fetchSummary(bookmark: Bookmark) {
       ? bookmark.sections.map((s, i) => (i === idx ? updatedSection : s))
       : [updatedSection, ...bookmark.sections];
   const updated = { ...bookmark, sections: newSections };
+  store.updateBookmark(updated);
+  store.saveBookmarks();
+}
+
+const QUESTION_TEMPLATE = `Answer the question regarding this webpage.\n\nWebpage content:\n{content}\n\n{question}`;
+
+export async function fetchAnswer(bookmark: Bookmark, question: string) {
+  if (!settings.geminiApiKey) return;
+
+  const result = await invoke<string>("fetch_ai_summary", {
+    url: bookmark.url,
+    apiKey: settings.geminiApiKey,
+    model: settings.geminiModel,
+    promptTemplate: QUESTION_TEMPLATE.replace("{question}", question),
+  });
+
+  // Update or insert the Summary section directly in the store bookmark
+  const b = store.bookmarks.get(bookmark.id);
+  if (!b) return;
+  const updated = {
+    ...b,
+    sections: [
+      {
+        heading: question,
+        body: `${result}\n\n*${settings.geminiModel} on ${formatDate(Date.now())}*`,
+      },
+      ...b.sections,
+    ],
+  };
   store.updateBookmark(updated);
   store.saveBookmarks();
 }
