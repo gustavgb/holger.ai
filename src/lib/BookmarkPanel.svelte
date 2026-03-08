@@ -21,7 +21,6 @@
     // svelte-ignore state_referenced_locally
     let tagsInput = $state(bookmark?.tags.join(", "));
     let fetchingTitle = $state(false);
-    let mounted = false;
     let lastSeenMtime = $state(0);
     const sections = $derived(bookmark?.sections);
     const mtime = $derived(bookmark?.mtime);
@@ -48,6 +47,7 @@
         };
     });
 
+    // Save on unmount
     $effect(() => () => save());
 
     function save() {
@@ -66,7 +66,16 @@
         }
     }
 
-    function clearSection(index: number) {}
+    function clearSection(index: number) {
+        if (!bookmark || !sections) return;
+
+        store.updateBookmark({
+            ...bookmark,
+            sections: sections.filter((_, idx) => idx !== index),
+        });
+
+        store.saveBookmarks();
+    }
 
     function openUrl() {
         invoke("open_url", { url: bookmark?.url }).catch(() => {

@@ -16,9 +16,6 @@
         return path.split("/").at(-1) ?? path;
     }
 
-    // unused but kept for parity
-    void dirName;
-
     let search = $state("");
 
     const sortedBookmarks = $derived(

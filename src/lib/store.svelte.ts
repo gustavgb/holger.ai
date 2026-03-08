@@ -10,13 +10,7 @@ import {
   watch,
   type WatchEvent,
 } from "@tauri-apps/plugin-fs";
-import { invoke } from "@tauri-apps/api/core";
-import {
-  type Workspace,
-  type WorkspaceFile,
-  type Bookmark,
-  EMPTY_INDEX,
-} from "./types";
+import { type WorkspaceFile, type Bookmark, EMPTY_INDEX } from "./types";
 import {
   bookmarkToMarkdown,
   markdownToBookmark,
@@ -56,7 +50,6 @@ class BookmarkStore {
   saving = $state(false);
   error = $state("");
 
-  private pendingWrites = 0;
   private unwatchFns: Array<() => void> = [];
 
   // ─── Low-level write helpers ───────────────────────────────────────────────
