@@ -21,6 +21,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "charset", "http2", "json"] }
 url = "2"
+htmlize = { version = "1.0.6", features = ["unescape"] }
 
 [profile.dev]
 incremental = true
