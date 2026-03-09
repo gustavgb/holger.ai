@@ -11,9 +11,6 @@
         quickPrompts,
     } from "./ai";
     import { settings } from "./settings.svelte";
-    import { tick } from "svelte";
-
-    let scrollEl = $state<HTMLDivElement | null>(null);
 
     function isNote(heading: string) {
         return /note/i.test(heading);
@@ -179,7 +176,7 @@
         </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto flex flex-col" bind:this={scrollEl}>
+    <div class="flex-1 overflow-y-auto flex flex-col">
         <!-- Bookmark details -->
         <div
             class="flex flex-col gap-1 px-4 py-3 border-b border-base-300 w-full min-w-0"

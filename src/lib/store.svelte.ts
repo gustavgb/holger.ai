@@ -266,6 +266,8 @@ class BookmarkStore {
           shouldWatchDir: false,
           closeBookmark: false,
         });
+
+        ui.activeBookmarkId = null;
       },
       { delayMs: 300 },
     )
