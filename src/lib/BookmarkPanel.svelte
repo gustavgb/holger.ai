@@ -21,7 +21,6 @@
 
     const bookmark = $derived(store.bookmarks.get(bookmarkId));
     const sections = $derived(bookmark?.sections);
-    const tags = $derived(bookmark?.tags);
     const note = $derived(sections?.find((s) => isNote(s.heading)));
 
     // svelte-ignore state_referenced_locally

@@ -32,9 +32,6 @@ class SettingsStore {
   geminiApiKey = $state<string>("");
   geminiModel = $state<string>(DEFAULT_MODEL);
 
-  private unwatchFn: (() => void) | null = null;
-  private lastSaveAt = 0;
-
   async init() {
     const configPath = await invoke<string>("get_settings_path");
     this.configPath = configPath;
@@ -58,14 +55,11 @@ class SettingsStore {
       // File doesn't exist yet — write defaults
       await this._write();
     }
-
-    this._watchFile();
   }
 
   private async _write() {
     if (!this.configPath) return;
     try {
-      this.lastSaveAt = Date.now();
       const settings: Settings = {
         lastOpenedFile: this.lastOpenedFile,
         recentWorkspaces: this.recentWorkspaces,
@@ -106,58 +100,6 @@ class SettingsStore {
   async setGeminiModel(model: string) {
     this.geminiModel = model;
     await this._write();
-  }
-
-  private _watchFile() {
-    const configPath = this.configPath;
-    if (!configPath) return;
-
-    let cancelled = false;
-    const self = this;
-
-    watch(
-      configPath,
-      async function (event: WatchEvent) {
-        if (cancelled) return;
-        if (Date.now() - self.lastSaveAt < 500) return;
-
-        const kind = event.type as object;
-        const isModify = "modify" in kind;
-        const isRemove = "remove" in kind;
-        if (!isModify && !isRemove) return;
-
-        try {
-          const text = await readTextFile(configPath);
-          const parsed = JSON.parse(text) as Settings;
-          self.lastOpenedFile = parsed.lastOpenedFile;
-          if (parsed.recentWorkspaces && parsed.recentWorkspaces.length > 0) {
-            self.recentWorkspaces = sortByFilename(
-              parsed.recentWorkspaces.slice(0, MAX_RECENT),
-            );
-          } else if (parsed.lastOpenedFile) {
-            self.recentWorkspaces = [parsed.lastOpenedFile];
-          }
-          self.geminiApiKey = parsed.geminiApiKey ?? "";
-          self.geminiModel = parsed.geminiModel ?? DEFAULT_MODEL;
-        } catch {
-          // ignore
-        }
-      },
-      { delayMs: 200 },
-    )
-      .then((fn) => {
-        if (cancelled) {
-          fn();
-          return;
-        }
-        self.unwatchFn = () => {
-          cancelled = true;
-          fn();
-        };
-      })
-      .catch((e) => {
-        console.error("[settings watch] failed:", e);
-      });
   }
 }
 

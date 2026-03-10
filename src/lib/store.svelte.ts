@@ -51,6 +51,7 @@ class BookmarkStore {
   lastSaveTime = $state(0);
 
   private unwatchFns: Array<() => void> = [];
+  private watchGeneration = 0;
 
   // ─── Low-level write helpers ───────────────────────────────────────────────
 
@@ -179,8 +180,6 @@ class BookmarkStore {
       this.bookmarks = bookmarks;
       this.dirPath = dirPath;
       this.dirty = [];
-
-      this._writeWorkspaceFile();
     } catch (e) {
       console.error("[store] openPath failed:", e);
       if (!silent) {
@@ -258,12 +257,15 @@ class BookmarkStore {
   // ─── File watcher ──────────────────────────────────────────────────────────
 
   private _stopWatchers() {
+    this.watchGeneration++;
     for (const fn of this.unwatchFns) fn();
     this.unwatchFns = [];
   }
 
   private _watchDir(dirPath: string) {
-    let cancelled = false;
+    const generation = this.watchGeneration;
+
+    const isStale = () => generation !== this.watchGeneration;
 
     // Watch the bookmarks sub-directory for individual file changes
     const watchPath = `${dirPath}/bookmarks`;
@@ -271,48 +273,41 @@ class BookmarkStore {
     watch(
       watchPath,
       async (event: WatchEvent) => {
-        if (cancelled || this.saving || Date.now() - this.lastSaveTime < 500)
+        if (isStale() || this.saving || Date.now() - this.lastSaveTime < 500)
           return;
         const kind = event.type as object;
         if (!("modify" in kind) && !("remove" in kind)) return;
 
-        this.openPath(this.dirPath, {
+        this.openPath(dirPath, {
           silent: true,
           shouldWatchDir: false,
           closeBookmark: false,
         });
-
-        ui.activeBookmarkId = null;
       },
       { delayMs: 300 },
     )
       .then((fn) => {
-        if (cancelled) {
+        if (isStale()) {
           fn();
           return;
         }
-        this.unwatchFns.push(() => {
-          cancelled = true;
-          fn();
-        });
+        this.unwatchFns.push(fn);
       })
       .catch((e) => console.error("[watch bookmarks] failed:", e));
 
     // Also watch clippy.json for idCounter changes
-    let indexCancelled = false;
     watch(
       indexPath(dirPath),
       async (event: WatchEvent) => {
-        if (indexCancelled) return;
+        if (isStale()) return;
         const kind = event.type as object;
         if (!("modify" in kind) && !("remove" in kind)) return;
         try {
-          const workspaceFile = JSON.parse(
-            await readTextFile(indexPath(dirPath)),
-          ) as WorkspaceFile;
-          this.idCounter = workspaceFile.idCounter;
-          this.quickPrompts =
-            workspaceFile.quickPrompts || NEW_WORKSPACE.quickPrompts;
+          this.openPath(dirPath, {
+            silent: true,
+            shouldWatchDir: !!("remove" in kind),
+            closeBookmark: false,
+          });
         } catch {
           // ignore
         }
@@ -320,17 +315,23 @@ class BookmarkStore {
       { delayMs: 300 },
     )
       .then((fn) => {
-        if (indexCancelled) {
+        if (isStale()) {
           fn();
           return;
         }
-        this.unwatchFns.push(() => {
-          indexCancelled = true;
-          fn();
-        });
+        this.unwatchFns.push(fn);
       })
       .catch((e) => console.error("[watch index] failed:", e));
   }
 }
 
 export const store = new BookmarkStore();
+
+// Tear down all watchers when the JS context is destroyed (HMR / page reload).
+// Without this, Rust keeps firing callbacks into dead callback IDs, which
+// produces the "Couldn't find callback id" warning.
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    store["_stopWatchers"]();
+  });
+}
