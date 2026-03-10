@@ -208,10 +208,13 @@ class BookmarkStore {
 
   // ─── Bookmark CRUD ─────────────────────────────────────────────────────────
 
-  addBookmark(partial: Omit<Bookmark, "id">): Bookmark {
+  addBookmark(partial: Omit<Bookmark, "id" | "mtime" | "ctime">): Bookmark {
     const id = ++this.idCounter;
+    const now = Date.now();
     const bookmark: Bookmark = {
       id,
+      mtime: now,
+      ctime: now,
       ...partial,
     };
     this.bookmarkIds = [id, ...this.bookmarkIds];

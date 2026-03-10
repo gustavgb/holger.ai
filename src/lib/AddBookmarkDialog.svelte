@@ -33,7 +33,6 @@
             title,
             tags: [],
             sections: [],
-            mtime: Date.now(),
         });
         ui.activeBookmarkId = bookmark.id;
 
