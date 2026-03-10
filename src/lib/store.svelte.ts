@@ -10,7 +10,12 @@ import {
   watch,
   type WatchEvent,
 } from "@tauri-apps/plugin-fs";
-import { type WorkspaceFile, type Bookmark, EMPTY_INDEX } from "./types";
+import {
+  type WorkspaceFile,
+  type Bookmark,
+  NEW_WORKSPACE,
+  type QuickPrompt,
+} from "./types";
 import {
   bookmarkToMarkdown,
   markdownToBookmark,
@@ -37,6 +42,7 @@ class BookmarkStore {
   dirPath = $state<string>("");
   bookmarkIds = $state<number[]>([]);
   idCounter = $state<number>(0);
+  quickPrompts = $state<QuickPrompt[]>([]);
 
   // Bookmarks state
   bookmarks = $state<Map<number, Bookmark>>(new Map());
@@ -56,6 +62,7 @@ class BookmarkStore {
       JSON.stringify(
         {
           idCounter: this.idCounter,
+          quickPrompts: this.quickPrompts,
         },
         null,
         2,
@@ -135,19 +142,14 @@ class BookmarkStore {
       if (!(await exists(indexPath(dirPath)))) {
         await writeTextFile(
           indexPath(this.dirPath),
-          JSON.stringify(
-            {
-              idCounter: 0,
-            },
-            null,
-            2,
-          ),
+          JSON.stringify(NEW_WORKSPACE, null, 2),
         );
       }
 
       // Read index
-      const indexText = await readTextFile(indexPath(dirPath));
-      const parsedWorkspaceFile = JSON.parse(indexText) as WorkspaceFile;
+      const parsedWorkspaceFile = JSON.parse(
+        await readTextFile(indexPath(dirPath)),
+      ) as WorkspaceFile;
 
       // Read all bookmark markdown files
       const bookmarkFiles = await readDir(bookmarksDir);
@@ -172,9 +174,13 @@ class BookmarkStore {
 
       this.bookmarkIds = bookmarkIds;
       this.idCounter = parsedWorkspaceFile.idCounter;
+      this.quickPrompts =
+        parsedWorkspaceFile.quickPrompts || NEW_WORKSPACE.quickPrompts;
       this.bookmarks = bookmarks;
       this.dirPath = dirPath;
       this.dirty = [];
+
+      this._writeWorkspaceFile();
     } catch (e) {
       console.error("[store] openPath failed:", e);
       if (!silent) {
@@ -305,6 +311,8 @@ class BookmarkStore {
             await readTextFile(indexPath(dirPath)),
           ) as WorkspaceFile;
           this.idCounter = workspaceFile.idCounter;
+          this.quickPrompts =
+            workspaceFile.quickPrompts || NEW_WORKSPACE.quickPrompts;
         } catch {
           // ignore
         }

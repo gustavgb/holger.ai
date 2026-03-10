@@ -4,13 +4,9 @@
     import { confirm } from "@tauri-apps/plugin-dialog";
     import { ui } from "./ui.svelte";
     import { formatRelativeTime } from "./utils";
-    import {
-        fetchAnswer,
-        getQuestionPrompt,
-        type QuickPrompt,
-        quickPrompts,
-    } from "./ai";
+    import { fetchAnswer, getQuestionPrompt } from "./ai";
     import { settings } from "./settings.svelte";
+    import { type QuickPrompt } from "./types";
 
     function isNote(heading: string) {
         return /note/i.test(heading);
@@ -280,7 +276,7 @@
 
             <!-- Quick prompts -->
             <div class="flex items-center gap-2 mt-2">
-                {#each quickPrompts as prompt}
+                {#each store.quickPrompts as prompt}
                     <button
                         class="btn btn-sm btn-outline btn-secondary"
                         onclick={() => runQuickPrompt(prompt)}
