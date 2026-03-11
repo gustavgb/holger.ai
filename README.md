@@ -9,7 +9,8 @@ A private, git-friendly, local-first bookmarking and research tool with optional
 ## Features
 
 - Bookmark websites and assign a fixed ID for reference in hand-written notes.
-- Summarize websites using Gemini models and ask AI questions directly in the app
+- Process websites using Gemini models and ask AI questions directly in the app.
+- Save your most used prompts in the workspace for quick processing.
 - Add your own tags and notes in the app.
 - Quickly find bookmarks using fuzzy search.
 - Data is stored in markdown files - easily checked into git and interoperable with Obsidian.md and other note apps.
