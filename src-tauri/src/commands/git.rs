@@ -71,54 +71,73 @@ fn git_run(args: &[&str], dir: &std::path::Path) -> Result<String, String> {
 
 /// Stages all changes in the workspace directory, commits with a timestamped
 /// message, and pushes to the remote.
+///
+/// The blocking git subprocess work is offloaded to a thread-pool thread via
+/// `spawn_blocking` so the async Tauri runtime is never stalled — even when
+/// `git push` takes a long time over a slow network connection.
 #[tauri::command]
-pub fn git_push(file_path: String) -> Result<String, String> {
-    // file_path is the workspace *directory* (e.g. my-bookmarks.clippyai)
-    let dir = std::path::Path::new(&file_path);
+pub async fn git_push(file_path: String) -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        // file_path is the workspace *directory* (e.g. my-bookmarks.clippyai)
+        let dir = std::path::PathBuf::from(&file_path);
 
-    if !dir.is_dir() {
-        return Err(format!("'{}' is not a directory", file_path));
-    }
+        if !dir.is_dir() {
+            return Err(format!("'{}' is not a directory", file_path));
+        }
 
-    // Step 1: Confirm it's a git repo and there are pending changes
-    let status_out = git_run(&["status", "--porcelain"], dir)
-        .map_err(|e| format!("git status failed — is this a git repository?\n{}", e))?;
+        // Step 1: Confirm it's a git repo and there are pending changes
+        let status_out = git_run(&["status", "--porcelain"], &dir)
+            .map_err(|e| format!("git status failed — is this a git repository?\n{}", e))?;
 
-    if status_out.trim().is_empty() {
-        return Err("No changes to commit.".to_string());
-    }
+        if status_out.trim().is_empty() {
+            return Err("No changes to commit.".to_string());
+        }
 
-    // Step 2: git add everything inside the workspace directory
-    git_run(&["add", "."], dir).map_err(|e| format!("git add failed:\n{}", e))?;
+        // Step 2: git add everything inside the workspace directory
+        git_run(&["add", "."], &dir).map_err(|e| format!("git add failed:\n{}", e))?;
 
-    // Step 3: git commit
-    let commit_msg = format!("Backup bookmarks {}", format_utc_now());
-    git_run(&["commit", "-m", &commit_msg], dir)
-        .map_err(|e| format!("git commit failed:\n{}", e))?;
+        // Step 3: git commit
+        let commit_msg = format!("Backup bookmarks {}", format_utc_now());
+        git_run(&["commit", "-m", &commit_msg], &dir)
+            .map_err(|e| format!("git commit failed:\n{}", e))?;
 
-    // Step 4: git push
-    git_run(&["push"], dir).map_err(|e| format!("git push failed:\n{}", e))?;
+        // Step 4: git push (this is the slow step — runs off the async thread)
+        git_run(&["push"], &dir).map_err(|e| format!("git push failed:\n{}", e))?;
 
-    Ok(format!(
-        "Bookmarks backed up successfully ({})",
-        format_utc_now()
-    ))
+        Ok(format!(
+            "Bookmarks backed up successfully ({})",
+            format_utc_now()
+        ))
+    })
+    .await
+    // The JoinError can only occur if the spawned thread panicked.
+    .map_err(|e| format!("git_push task panicked: {}", e))?
 }
 
 /// Runs `git pull --ff` in the workspace directory.
+///
+/// Like `git_push`, the blocking subprocess is run on a thread-pool thread so
+/// the async Tauri runtime stays responsive while the network operation is in
+/// progress.
 #[tauri::command]
-pub fn git_pull(file_path: String) -> Result<String, String> {
-    // file_path is the workspace *directory*
-    let dir = std::path::Path::new(&file_path);
+pub async fn git_pull(file_path: String) -> Result<String, String> {
+    tauri::async_runtime::spawn_blocking(move || {
+        // file_path is the workspace *directory*
+        let dir = std::path::PathBuf::from(&file_path);
 
-    if !dir.is_dir() {
-        return Err(format!("'{}' is not a directory", file_path));
-    }
+        if !dir.is_dir() {
+            return Err(format!("'{}' is not a directory", file_path));
+        }
 
-    // Verify this is a git repository
-    git_run(&["status"], dir).map_err(|e| format!("Not a git repository:\n{}", e))?;
+        // Verify this is a git repository
+        git_run(&["status"], &dir).map_err(|e| format!("Not a git repository:\n{}", e))?;
 
-    let out = git_run(&["pull", "--ff"], dir).map_err(|e| format!("git pull failed:\n{}", e))?;
+        let out =
+            git_run(&["pull", "--ff"], &dir).map_err(|e| format!("git pull failed:\n{}", e))?;
 
-    Ok(out.trim().to_string())
+        Ok(out.trim().to_string())
+    })
+    .await
+    // The JoinError can only occur if the spawned thread panicked.
+    .map_err(|e| format!("git_pull task panicked: {}", e))?
 }
