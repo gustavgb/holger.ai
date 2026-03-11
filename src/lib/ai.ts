@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { settings } from "./settings.svelte";
 import { AIPrompt, Bookmark } from "./types";
 import { store } from "./store.svelte";
-import { formatDateTime } from "./utils";
+import { formatDateTime } from "./utils.svelte";
 import { message } from "@tauri-apps/plugin-dialog";
 
 const QUESTION_TEMPLATE = `Answer the question regarding this webpage.\n\nWebpage content:\n{content}\n\n{question}`;

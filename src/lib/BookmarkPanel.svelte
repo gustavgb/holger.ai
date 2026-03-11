@@ -3,7 +3,7 @@
     import { store } from "./store.svelte";
     import { confirm } from "@tauri-apps/plugin-dialog";
     import { ui } from "./ui.svelte";
-    import { formatRelativeTime } from "./utils";
+    import { formatBookmarkId, formatRelativeTime } from "./utils.svelte";
     import { fetchAnswer, getQuestionPrompt } from "./ai";
     import { settings } from "./settings.svelte";
     import { type QuickPrompt } from "./types";
@@ -160,7 +160,8 @@
     <div
         class="flex items-center justify-between px-4 py-3 border-b border-base-300 shrink-0"
     >
-        <span class="text-xs text-base-content/60 font-mono">#{bookmarkId}</span
+        <span class="text-xs text-base-content/60 font-mono"
+            >{formatBookmarkId(bookmarkId)}</span
         >
         <div class="flex items-center gap-2">
             <span class="text-xs text-base-content/60">
@@ -275,7 +276,7 @@
 
             <!-- Quick prompts -->
             <div class="flex items-center gap-2 mt-2">
-                {#each store.quickPrompts as prompt}
+                {#each store.workspace.quickPrompts as prompt}
                     <button
                         class="btn btn-sm btn-outline btn-secondary"
                         onclick={() => runQuickPrompt(prompt)}
@@ -340,7 +341,7 @@
 </div>
 
 {#if urlContextMenu}
-    <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+    <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
     <div class="fixed inset-0 z-40" onclick={closeUrlContextMenu}></div>
     <ul
         class="menu menu-sm bg-base-200 border border-base-300 rounded-box shadow-lg fixed z-50 p-1 min-w-36"

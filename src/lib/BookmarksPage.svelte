@@ -5,6 +5,7 @@
     import BookmarkPanel from "./BookmarkPanel.svelte";
     import { ui } from "./ui.svelte";
     import Fuse from "fuse.js";
+    import { formatBookmarkId } from "./utils.svelte";
 
     let listEl = $state<HTMLDivElement | null>(null);
     let searchEl = $state<HTMLInputElement | null>(null);
@@ -251,7 +252,7 @@
                 <div class="flex items-baseline gap-1.5 mb-1 flex-wrap">
                     <span
                         class="text-xs text-base-content/50 font-mono shrink-0"
-                        >#{b.id}</span
+                        >{formatBookmarkId(b.id)}</span
                     >
                     <span
                         class="text-sm font-medium flex-1 min-w-0 truncate"

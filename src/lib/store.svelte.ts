@@ -41,8 +41,7 @@ class BookmarkStore {
   // Workspace state
   dirPath = $state<string>("");
   bookmarkIds = $state<number[]>([]);
-  idCounter = $state<number>(0);
-  quickPrompts = $state<QuickPrompt[]>([]);
+  workspace = $state<WorkspaceFile>(NEW_WORKSPACE);
 
   // Bookmarks state
   bookmarks = $state<Map<number, Bookmark>>(new Map());
@@ -60,14 +59,7 @@ class BookmarkStore {
 
     await writeTextFile(
       indexPath(this.dirPath),
-      JSON.stringify(
-        {
-          idCounter: this.idCounter,
-          quickPrompts: this.quickPrompts,
-        },
-        null,
-        2,
-      ),
+      JSON.stringify(this.workspace, null, 2),
     );
   }
 
@@ -119,7 +111,7 @@ class BookmarkStore {
 
   close() {
     this._stopWatchers();
-    this.idCounter = 0;
+    this.workspace = NEW_WORKSPACE;
     this.bookmarkIds = [];
     this.bookmarks = new Map();
     this.dirPath = "";
@@ -174,9 +166,7 @@ class BookmarkStore {
       }
 
       this.bookmarkIds = bookmarkIds;
-      this.idCounter = parsedWorkspaceFile.idCounter;
-      this.quickPrompts =
-        parsedWorkspaceFile.quickPrompts || NEW_WORKSPACE.quickPrompts;
+      this.workspace = parsedWorkspaceFile;
       this.bookmarks = bookmarks;
       this.dirPath = dirPath;
       this.dirty = [];
@@ -214,7 +204,7 @@ class BookmarkStore {
   // ─── Bookmark CRUD ─────────────────────────────────────────────────────────
 
   addBookmark(partial: Omit<Bookmark, "id" | "mtime" | "date">): Bookmark {
-    const id = ++this.idCounter;
+    const id = ++this.workspace.idCounter;
     const bookmark: Bookmark = {
       id,
       mtime: Date.now(),
@@ -277,11 +267,15 @@ class BookmarkStore {
         const kind = event.type as object;
         if (!("modify" in kind) && !("remove" in kind)) return;
 
-        this.openPath(dirPath, {
+        await this.openPath(dirPath, {
           silent: true,
           shouldWatchDir: false,
           closeBookmark: false,
         });
+
+        if (this.bookmarkIds.indexOf(ui.activeBookmarkId || -1) === -1) {
+          ui.activeBookmarkId = null;
+        }
       },
       { delayMs: 300 },
     )
@@ -302,7 +296,7 @@ class BookmarkStore {
         const kind = event.type as object;
         if (!("modify" in kind) && !("remove" in kind)) return;
         try {
-          this.openPath(dirPath, {
+          await this.openPath(dirPath, {
             silent: true,
             shouldWatchDir: !!("remove" in kind),
             closeBookmark: false,

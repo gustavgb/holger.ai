@@ -1,3 +1,5 @@
+import { store } from "./store.svelte";
+
 export function formatRelativeTime(value: string | number | undefined): string {
   if (value === undefined || value === null) return "";
   try {
@@ -42,4 +44,8 @@ export function formatDateTime(value: string | number): string {
   } catch {
     return "";
   }
+}
+
+export function formatBookmarkId(id: number) {
+  return `#${store.workspace.idPrefix ? `${store.workspace.idPrefix}-` : ""}${id}`;
 }

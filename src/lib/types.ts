@@ -16,32 +16,13 @@ export interface Bookmark {
 export interface WorkspaceFile {
   idCounter: number;
   quickPrompts: QuickPrompt[];
-}
-
-export interface Workspace {
-  dirPath: string;
-  idCounter: number;
-  bookmarks: number[];
+  idPrefix: string;
 }
 
 export const NEW_WORKSPACE: WorkspaceFile = {
   idCounter: 0,
-  quickPrompts: [
-    {
-      label: "Summarize",
-      labelFetching: "Summarizing",
-      title: "AI Summary",
-      promptTemplate:
-        "Summarize the main content of the following webpage in 3-5 sentences.\n\nWebpage content:\n{content}",
-    },
-    {
-      label: "Analyze credibility",
-      labelFetching: "Analyzing credibility",
-      title: "Credibility analysis",
-      promptTemplate:
-        "Analyze and judge the credibility of this content in 5-7 sentences. Be critical but fair.\n\nWebpage content:\n{content}",
-    },
-  ],
+  quickPrompts: [],
+  idPrefix: "",
 };
 
 export type AIPrompt = {
