@@ -7,7 +7,7 @@
 ```json
 {
   ...
-  "quickPrompts": "quickPrompts": [
+  "quickPrompts": [
     {
       "label": "Summarize",
       "labelFetching": "Summarizing",
