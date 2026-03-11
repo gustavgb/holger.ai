@@ -1,5 +1,16 @@
 # clippy.ai docs
 
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+N` | Add bookmark |
+| `Ctrl+F`/`Ctrl+K` | Focus searchbar |
+| `Ctrl+O` | Open workspace file |
+| `Ctrl+Q` | Close (asks if there are unsaved changes) |
+| `Ctrl+Tab`/`Ctrl+Shift+Tab` | Cycle recent workspaces |
+
+
 ## Quick Prompts Example
 
 `./clippy.json`:
