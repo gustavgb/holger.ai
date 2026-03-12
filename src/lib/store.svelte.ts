@@ -28,7 +28,7 @@ import { ui } from "./ui.svelte";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function indexPath(dirPath: string): string {
-  return `${dirPath}/clippy.json`;
+  return `${dirPath}/.clippy.json`;
 }
 
 function bookmarkPath(dirPath: string, id: number): string {
@@ -288,7 +288,7 @@ class BookmarkStore {
       })
       .catch((e) => console.error("[watch bookmarks] failed:", e));
 
-    // Also watch clippy.json for idCounter changes
+    // Also watch .clippy.json for idCounter changes
     watch(
       indexPath(dirPath),
       async (event: WatchEvent) => {

@@ -13,7 +13,7 @@
 
 ## Quick Prompts Example
 
-`./clippy.json`:
+`./.clippy.json`:
 
 ```json
 {

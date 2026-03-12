@@ -12,79 +12,63 @@
     {
       "identifier": "fs:allow-read-text-file",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" },
+        { "path": "$HOME/*/**/.clippy.json" }
       ]
     },
     {
       "identifier": "fs:allow-write-text-file",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" },
+        { "path": "$HOME/*/**/.clippy.json" }
       ]
     },
     {
       "identifier": "fs:allow-read-dir",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" }
       ]
     },
     {
       "identifier": "fs:allow-exists",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" },
+        { "path": "$HOME/*/**/.clippy.json" }
       ]
     },
     {
       "identifier": "fs:allow-watch",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" },
+        { "path": "$HOME/*/**/.clippy.json" }
       ]
     },
     "fs:allow-unwatch",
     {
       "identifier": "fs:allow-stat",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" },
+        { "path": "$HOME/*/**/.clippy.json" }
       ]
     },
     {
       "identifier": "fs:allow-remove",
       "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" }
       ]
     },
     "fs:default",
@@ -92,9 +76,9 @@
     {
       "identifier": "fs:allow-mkdir",
       "allow": [
-        {
-          "path": "$HOME/**"
-        }
+        { "path": "$HOME/.config/clippy.ai/**" },
+        { "path": "$HOME/[!.]*" },
+        { "path": "$HOME/[!.]*/**" }
       ]
     }
   ]
