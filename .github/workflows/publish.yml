@@ -18,9 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-14" # Apple Silicon (arm64)
-            args: ""
-          - platform: "macos-13" # Intel
+          - platform: "macos-latest" # Apple Silicon (arm64)
             args: ""
           - platform: "ubuntu-22.04"
             args: ""
