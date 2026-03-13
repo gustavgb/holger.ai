@@ -5,8 +5,9 @@ on:
     tags:
       - "v*"
 
-# This workflow will trigger on each push to the `release` branch to create or update a GitHub release,
-# build your Tauri app, and upload the artifacts to the release.
+    # This workflow will trigger on each push to a tag matching "v*"
+    # to create or update a GitHub release, build your Tauri app,
+    # and upload the artifacts to the release.
 
 jobs:
   publish-tauri:
@@ -30,12 +31,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: lts/*
+
+      - name: Install pnpm
+        run: corepack enable
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -54,7 +58,7 @@ jobs:
             patchelf
 
       - name: Install frontend dependencies
-        run: pnpm install # change this to npm, pnpm or bun depending on which one you use.
+        run: pnpm install
 
       - name: Build and publish Tauri app
         uses: tauri-apps/tauri-action@v0.6.1
