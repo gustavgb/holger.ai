@@ -1,8 +1,8 @@
 [package]
 name = "clippyai"
 version = "0.1.0"
-description = "A minimalist markdown editor"
-authors = []
+description = "A private, git-friendly, local-first bookmarking and research tool with optional AI power-ups"
+authors = ["Gustav Gram Fryd"]
 edition = "2021"
 
 [lib]
